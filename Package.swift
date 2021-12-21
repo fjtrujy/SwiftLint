@@ -1,4 +1,4 @@
-// swift-tools-version:5.2
+// swift-tools-version:5.5
 import PackageDescription
 
 #if canImport(CommonCrypto)
@@ -12,7 +12,8 @@ let package = Package(
     platforms: [.macOS(.v10_12)],
     products: [
         .executable(name: "swiftlint", targets: ["swiftlint"]),
-        .library(name: "SwiftLintFramework", targets: ["SwiftLintFramework"])
+        .library(name: "SwiftLintFramework", targets: ["SwiftLintFramework"]),
+        .plugin(name: "SwiftLintPlugin", targets: ["SwiftLintPlugin"])
     ],
     dependencies: [
         .package(name: "swift-argument-parser", url: "https://github.com/apple/swift-argument-parser.git", from: "1.0.1"),
@@ -21,7 +22,7 @@ let package = Package(
         .package(url: "https://github.com/scottrhoyt/SwiftyTextTable.git", from: "0.9.0"),
     ] + (addCryptoSwift ? [.package(url: "https://github.com/krzyzanowskim/CryptoSwift.git", .upToNextMinor(from: "1.3.2"))] : []),
     targets: [
-        .target(
+        .executableTarget(
             name: "swiftlint",
             dependencies: [
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
@@ -36,6 +37,12 @@ let package = Package(
                 "Yams",
             ] + (addCryptoSwift ? ["CryptoSwift"] : [])
         ),
+        .plugin(name: "SwiftLintPlugin",
+                capability: .buildTool(),
+                dependencies: [
+                    "swiftlint"
+                ]
+        ),
         .testTarget(
             name: "SwiftLintFrameworkTests",
             dependencies: [
@@ -45,5 +52,6 @@ let package = Package(
                 "Resources",
             ]
         )
+        
     ]
 )
